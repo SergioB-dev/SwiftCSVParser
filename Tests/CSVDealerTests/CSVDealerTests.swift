@@ -9,7 +9,6 @@ struct TestPerson: CSVConvertible {
     static var columnMappings: [String : any CodingKey] {
         ["name": CodingKeys.name, "age": CodingKeys.age, "email": CodingKeys.email]
     }
-    
 }
 
 @Test func decodeType() async throws {

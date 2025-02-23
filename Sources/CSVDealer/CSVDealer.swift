@@ -4,7 +4,7 @@
 import Foundation
 
 
-struct CSVParser<T: CSVConvertible> {
+public struct CSVParser<T: CSVConvertible> {
     private let headers: [String]
     private var nonHeaderRows: [[String]]
     
@@ -51,7 +51,7 @@ struct CSVParser<T: CSVConvertible> {
     }
 }
 
-protocol CSVConvertible: Decodable {
+public protocol CSVConvertible: Decodable {
     static var columnMappings: [String: CodingKey] { get }
 }
 
