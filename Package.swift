@@ -18,7 +18,10 @@ let package = Package(
             name: "CSVDealer"),
         .testTarget(
             name: "CSVDealerTests",
-            dependencies: ["CSVDealer"]
+            dependencies: ["CSVDealer"],
+            resources: [
+                .copy("Resources/personFixture.csv")
+            ]
         ),
     ]
 )

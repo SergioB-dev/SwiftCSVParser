@@ -5,37 +5,35 @@ import Foundation
 
 
 public struct CSVParser<T: CSVConvertible> {
-    private let headers: [String]
-    private var nonHeaderRows: [[String]]
+    let headers: [String]
+    var nonHeaderRows: [[String]]
     
-    init?(csvPath: String, encoding: String.Encoding = .utf8) throws {
-        
+    public init(csvPath: String, encoding: String.Encoding = .utf8) throws {
         let content = try String(contentsOfFile: csvPath, encoding: encoding)
-        
-        var interimResults = [[String]]()
-        content.components(separatedBy: "\n").forEach { line in
-            let columns = line.split(separator: ",").map(String.init)
-            interimResults.append(columns)
-        }
-        guard let interimHeaders = interimResults.first else { throw CSVDecodingError.invalidCSVFormat }
-        
-        headers = interimHeaders
-        nonHeaderRows = interimResults
+        (headers, nonHeaderRows) = try Self.separateHeadersFromRows(from: content)
     }
     
-    init(stringLiteral: String, encoding: String.Encoding = .utf8) throws {
-        let lines = stringLiteral.components(separatedBy: "\n")
-        guard let headerLine = lines.first else { throw CSVDecodingError.invalidCSVFormat }
-        headers = headerLine.components(separatedBy: ",").map { String($0) }
+    public init(stringLiteral: String, encoding: String.Encoding = .utf8) throws {
+        (headers, nonHeaderRows) = try Self.separateHeadersFromRows(from: stringLiteral)
+    }
+    
+    static private func separateHeadersFromRows(from string: String) throws -> (headers: [String], nonHeaderRows: [[String]]) {
+        var headers: [String] = []
+        var nonHeaderRows: [[String]] = []
         
+        let lines = string.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: "\n")
+        guard let headerLine = lines.first else { throw CSVDecodingError.invalidCSVFormat }
+        
+        headers = headerLine.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: ",").map { String($0) }
         let rows = lines
             .dropFirst()
             .map { $0.components(separatedBy: ",").map { String($0) } }
             
         nonHeaderRows = rows
+        return (headers, nonHeaderRows)
     }
     
-    func parse() throws -> [T] {
+    public func parse() throws -> [T] {
         let decoder = CSVDecoder<T>()
         var results: [T] = []
         
@@ -55,22 +53,10 @@ public protocol CSVConvertible: Decodable {
     static var columnMappings: [String: CodingKey] { get }
 }
 
-private struct CSVDecoder<T: CSVConvertible> {
-    func decode(row: [String: String]) throws -> T {
-        var decodedValues: [String: Any] = [:]
-        
-        for (csvColumn, codingKey) in T.columnMappings {
-            guard let value = row[csvColumn] else { throw CSVDecodingError.missingRequiredColumn(csvColumn) }
-            decodedValues[codingKey.stringValue] = value
-        }
-        
-        let jsonData = try JSONSerialization.data(withJSONObject: decodedValues)
-        return try JSONDecoder().decode(T.self, from: jsonData)
-    }
-}
 
-enum CSVDecodingError: Error {
+public enum CSVDecodingError: Error {
     case invalidCSVFormat
+    case cannotFindFile
     case missingRequiredColumn(String)
 }
 
