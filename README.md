@@ -22,5 +22,5 @@
   }
 
     let parser = try CSVParser<TestPerson>(stringLiteral: testCSVString)
-    let results = try parser.parse()
+    let results: [TestPerson] = try parser.parse()
 ```
