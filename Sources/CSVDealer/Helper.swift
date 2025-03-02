@@ -8,7 +8,7 @@
 import Foundation
 
 struct CSVDecoder<T: CSVConvertible> {
-    func decode(row: [String: String]) throws -> T {
+    func decode(row: [String: Any]) throws -> T {
         var decodedValues: [String: Any] = [:]
         
         for (csvColumn, codingKey) in T.columnMappings {

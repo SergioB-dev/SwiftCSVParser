@@ -20,7 +20,8 @@ let package = Package(
             name: "CSVDealerTests",
             dependencies: ["CSVDealer"],
             resources: [
-                .copy("Resources/personFixture.csv")
+                .copy("Resources/personFixture.csv"),
+                .copy("Resources/grammarByDua.csv")
             ]
         ),
     ]

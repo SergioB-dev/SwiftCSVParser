@@ -11,6 +11,31 @@ struct TestPerson: CSVConvertible {
         ["name": CodingKeys.name, "age": CodingKeys.age, "email": CodingKeys.email]
     }
 }
+
+struct GrammarByDuaRow: CSVConvertible {
+    let dua: String
+    let duaWithHarakat: String
+    let source: String
+    let sourceEnglish: String
+    let englishTranslation: String
+    let category: String
+    let reasoning: String
+    let keywords: [String]
+    
+    static var columnMappings: [String : any CodingKey] {
+        [
+            "dua": CodingKeys.dua,
+            "duaWithHarakat": CodingKeys.duaWithHarakat,
+            "source": CodingKeys.source,
+            "sourceEnglish": CodingKeys.sourceEnglish,
+            "englishTranslation": CodingKeys.englishTranslation,
+            "category": CodingKeys.category,
+            "reasoning": CodingKeys.reasoning,
+            "keywords": CodingKeys.keywords
+        ]
+    }
+}
+
 final class CSVParserTests {
     @Test func decodeFromString() throws {
         let testCSVString = """
@@ -30,22 +55,23 @@ final class CSVParserTests {
     }
 
     @Test func decodeFromFile() throws {
-
-        if let resourcePath = Bundle(for: CSVParserTests.self).resourcePath {
-            let fileManager = FileManager.default
-            do {
-                let items = try fileManager.contentsOfDirectory(atPath: resourcePath)
-                print("Files in bundle: \(items)")
-            } catch {
-                print("Could not list files in bundle: \(error)")
-            }
-        }
-        
-        // In test code, use the test bundle instead of Bundle.main
         let path = Bundle.module.url(forResource: "personFixture", withExtension: "csv")?.path() ?? ""
         print(path)
         let parser = try CSVParser<TestPerson>(csvPath: path)
         let results = try parser.parse()
+        #expect(results.count > 0)
     }
+    
+    
+    /// Correctly parses columns that have columns with ["x", "y", ...] format
+    @Test func decodeFileWithStringArrayColumn() throws {
+        let path = Bundle.module.url(forResource: "grammarByDua", withExtension: "csv")?.path() ?? ""
+        print(path)
+        let parser = try CSVParser<GrammarByDuaRow>(csvPath: path)
+        let loaded = try parser.parse()
+        #expect(loaded.count > 0)
+        #expect(Set(loaded[0].keywords) == Set(["ديني", "الدنيا"]))
+    }
+    
 }
 
