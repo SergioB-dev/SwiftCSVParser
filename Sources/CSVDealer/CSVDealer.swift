@@ -54,12 +54,18 @@ public struct CSVParser<T: CSVConvertible> {
         return (headers, nonHeaderRows)
     }
     
-    public func parse() throws -> [T] {
+    public func parse(lineCountToParse: Int? = nil) throws -> [T] {
         let decoder = CSVDecoder<T>()
         var results: [T] = []
         
+        let rowsToParse:[[Any]]
+        if let lineLimit = lineCountToParse {
+            rowsToParse = Array(nonHeaderRows.prefix(lineLimit))
+        }else {
+            rowsToParse = nonHeaderRows
+        }
         
-        for row in nonHeaderRows {
+        for row in rowsToParse {
             guard row.count == headers.count else { throw CSVDecodingError.invalidCSVFormat }
             let rowDict = Dictionary(uniqueKeysWithValues: zip(headers, row))
             
