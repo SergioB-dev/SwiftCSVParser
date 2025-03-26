@@ -54,6 +54,7 @@ final class CSVParserTests {
         #expect(results[0].age == "30")
     }
 
+    @available(iOS 16.0, *)
     @Test func decodeFromFile() throws {
         let path = Bundle.module.url(forResource: "personFixture", withExtension: "csv")?.path() ?? ""
         print(path)
@@ -64,6 +65,7 @@ final class CSVParserTests {
     
     
     /// Correctly parses columns that have columns with ["x", "y", ...] format
+    @available(iOS 16.0, *)
     @Test func decodeFileWithStringArrayColumn() throws {
         let path = Bundle.module.url(forResource: "grammarByDua", withExtension: "csv")?.path() ?? ""
         print(path)
@@ -71,6 +73,15 @@ final class CSVParserTests {
         let loaded = try parser.parse()
         #expect(loaded.count > 0)
         #expect(Set(loaded[0].keywords) == Set(["ديني", "الدنيا"]))
+    }
+    
+    @available(iOS 16.0, *)
+    @Test func testParseWithLineCount() throws {
+        let path = Bundle.module.url(forResource: "personFixture", withExtension: "csv")?.path() ?? ""
+        print(path)
+        let parser = try CSVParser<TestPerson>(csvPath: path)
+        let result = try parser.parse(randomN: 2)
+        #expect(result.count == 2)
     }
     
 }
