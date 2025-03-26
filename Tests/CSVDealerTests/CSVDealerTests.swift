@@ -80,7 +80,7 @@ final class CSVParserTests {
         let path = Bundle.module.url(forResource: "personFixture", withExtension: "csv")?.path() ?? ""
         print(path)
         let parser = try CSVParser<TestPerson>(csvPath: path)
-        let result = try parser.parse(lineCountToParse: 2)
+        let result = try parser.parse(randomN: 2)
         #expect(result.count == 2)
     }
     

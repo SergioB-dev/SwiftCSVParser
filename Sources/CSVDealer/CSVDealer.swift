@@ -54,14 +54,14 @@ public struct CSVParser<T: CSVConvertible> {
         return (headers, nonHeaderRows)
     }
     
-    public func parse(lineCountToParse: Int? = nil) throws -> [T] {
+    public func parse(randomN: Int? = nil) throws -> [T] {
         let decoder = CSVDecoder<T>()
         var results: [T] = []
         
         let rowsToParse:[[Any]]
-        if let lineLimit = lineCountToParse {
-            rowsToParse = Array(nonHeaderRows.prefix(lineLimit))
-        }else {
+        if let lineLimit = randomN {
+            rowsToParse = Array(nonHeaderRows.shuffled().prefix(lineLimit))
+        } else {
             rowsToParse = nonHeaderRows
         }
         
